@@ -1,16 +1,20 @@
-require('dotenv').config()
-import Express from "express"
+require('dotenv').config();
+import Express from 'express';
+import * as db from './database';
 
-import('./firebase');
-import('./database');
+export const app = Express();
+app.use(Express.json()); // Allow Express to parse JSON in request bodies
 
 (async () => {
-  const app = Express()
+  await import('./firebase');
+  await db.initialize();
 
-  app.get("/", (req, res) => {
-      res.send(`request ${req} - Hello World! - ${JSON.stringify(process.env)}`);
+  // Use authentication middleware
+  await import('./auth');
+
+  app.get('/', (req, res) => {
+    res.send(`request ${req} - Hello World! - ${JSON.stringify(process.env)}`);
   });
 
-  app.listen(3000)
-
+  app.listen(3000);
 })();
