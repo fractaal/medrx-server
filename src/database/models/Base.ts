@@ -1,10 +1,9 @@
-import { Model } from 'objection'
-import { knex } from '../'
+import { Model } from 'objection';
+import { knex } from '..';
 
 Model.knex(knex);
 
-export class BaseModel extends Model {
-
+export class Base extends Model {
   updatedAt!: string;
   createdAt!: string;
 

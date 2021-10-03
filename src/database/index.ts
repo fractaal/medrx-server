@@ -1,4 +1,5 @@
 import Knex from 'knex';
+import { knexSnakeCaseMappers } from 'objection';
 import Logger from '../logger';
 import { initialize as _initialize } from './migration';
 import { getDbConfig } from '../db-config';

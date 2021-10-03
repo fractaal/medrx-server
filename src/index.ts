@@ -1,9 +1,12 @@
 require('dotenv').config();
 import Express from 'express';
+import cors from 'cors';
 import * as db from './database';
+import seeder from './seeder';
 
 export const app = Express();
 app.use(Express.json()); // Allow Express to parse JSON in request bodies
+app.use(cors());
 
 (async () => {
   await import('./firebase');
@@ -16,5 +19,12 @@ app.use(Express.json()); // Allow Express to parse JSON in request bodies
     res.send(`request ${req} - Hello World! - ${JSON.stringify(process.env)}`);
   });
 
-  app.listen(3000);
+  import('./routes/storefront');
+
+  app.listen(80);
+
+  // Seeder!!!
+  if (process.env.SEED) {
+    await seeder();
+  }
 })();
