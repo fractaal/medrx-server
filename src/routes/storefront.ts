@@ -13,9 +13,10 @@ app.get('/storefront', async (req, res) => {
 
   const products = await Product.query()
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-    .orderBy('updatedAt')
-    .select(['name', 'price', 'description', 'id'])
-    .limit(15);
+    .orderBy('products.updatedAt')
+    .select(['products.name', 'price', 'description', 'products.id', 'vendorId', 'vendor.name as vendorName'])
+    .limit(15)
+    .joinRelated('vendor');
 
   logger.log(`Returning ${products.length} products for user ${req.tokenData?.email} @ ${req.tokenData?.region}`);
 
