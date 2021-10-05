@@ -5,7 +5,7 @@ import Product from '../database/models/Product';
 
 const logger = Logger('Search');
 
-app.get('/search', async (req, res) => {
+app.post('/search', async (req, res) => {
   if (!req.isAuthenticated) {
     res.status(401).json(new ResponseData(true, 'You are not logged in!'));
     return;
