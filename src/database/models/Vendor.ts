@@ -18,14 +18,12 @@ export default class Vendor extends Base {
   }
 
   static get relationMappings() {
-    const Product = require('./Product');
-
     return {
       vendor: {
         relation: Model.HasManyRelation,
-        modelClass: Product,
+        modelClass: 'Product',
         join: {
-          from: 'vendor.id',
+          from: 'vendors.id',
           to: 'products.vendorId',
         },
       },

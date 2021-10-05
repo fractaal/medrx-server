@@ -20,15 +20,13 @@ export default class Product extends Base {
   }
 
   static get relationMappings() {
-    const Vendor = require('./Vendor');
-
     return {
       vendor: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Vendor,
+        modelClass: 'Vendor',
         join: {
           from: 'products.vendorId',
-          to: 'vendor.id',
+          to: 'vendors.id',
         },
       },
     };
