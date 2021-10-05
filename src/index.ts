@@ -19,7 +19,7 @@ app.use(cors());
   import('./routes/storefront');
   import('./routes/search');
 
-  app.listen(80);
+  app.listen(process.env.PORT ?? 80);
 
   // Seeder!!!
   if (process.env.SEED) {
