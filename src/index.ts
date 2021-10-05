@@ -15,11 +15,9 @@ app.use(cors());
   // Use authentication middleware
   await import('./auth');
 
-  app.get('/', (req, res) => {
-    res.send(`request ${req} - Hello World! - ${JSON.stringify(process.env)}`);
-  });
-
+  // Routes
   import('./routes/storefront');
+  import('./routes/search');
 
   app.listen(80);
 
