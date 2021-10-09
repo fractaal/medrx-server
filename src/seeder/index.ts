@@ -19,8 +19,13 @@ export default async () => {
     await Vendor.query().withSchema('REGION_X').insert(toInsert);
   }
 
+  const ids = await Vendor.query().withSchema('REGION_X').select('id');
+
+  console.log(ids);
+
   for (let i = 0; i < 100; i++) {
-    const id = Math.round((Math.random() + 1) * 5);
+    const idx = Math.round(Math.random() * ids.length - 1);
+    const id = ids[idx].id;
     log.log(`Foreign key ${id}`);
 
     const toInsert = {
