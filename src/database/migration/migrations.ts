@@ -6,26 +6,32 @@ export const migrations = [
     description: 'Insert product table & vendors',
     up: async (knex, schema) => {
       await knex.schema.withSchema(schema).createTable('vendors', (t) => {
-        t.increments('id').primary().notNullable();
+        t.uuid('id').primary().notNullable().defaultTo(knex.raw('gen_random_uuid()'));
 
         t.string('name').notNullable();
         t.string('content', 1000);
         t.string('city').notNullable();
         t.integer('rating');
 
+        t.string('photoUrl');
+
+        t.json('metadata');
+
         t.timestamp('updatedAt');
         t.timestamp('createdAt');
       });
 
       await knex.schema.withSchema(schema).createTable('products', (t) => {
-        t.increments('id').primary().notNullable();
-        t.integer('vendorId').references('id').inTable(`${schema}.vendors`);
+        t.uuid('id').primary().notNullable().defaultTo(knex.raw('gen_random_uuid()'));
+        t.uuid('vendorId').references('id').inTable(`${schema}.vendors`);
 
         t.string('name').notNullable();
         t.string('description');
         t.integer('price').notNullable();
         t.json('metadata');
         t.boolean('isPrescriptionRequired').notNullable();
+
+        t.string('photoUrl');
 
         t.timestamp('updatedAt');
         t.timestamp('createdAt');
