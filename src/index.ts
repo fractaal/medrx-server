@@ -18,6 +18,7 @@ app.use(cors());
   // Routes
   import('./routes/storefront');
   import('./routes/search');
+  import('./routes/product');
 
   app.listen(process.env.PORT ?? 80);
 
