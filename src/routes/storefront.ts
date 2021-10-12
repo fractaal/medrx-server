@@ -21,7 +21,7 @@ app.get('/storefront', async (req, res) => {
       'products.id',
       'vendorId',
       'vendor.name as vendorName',
-      'photoUrl',
+      'products.photoUrl',
     ])
     .limit(15)
     .joinRelated('vendor');
