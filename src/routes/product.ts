@@ -20,8 +20,8 @@ app.get('/product/:id', async (req, res) => {
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
     .findById(req.params.id);
 
-  if (product) res.json(product);
-  else res.json(null);
+  if (product) res.json(new ResponseData(false, 'Product successfully retrieved', product));
+  else res.json(new ResponseData(false, 'No such product with supplied ID', null));
 
   logger.log(`Returning ${req.params.id} product for user ${req.tokenData?.email} @ ${req.tokenData?.region}`);
   // res.json(products);

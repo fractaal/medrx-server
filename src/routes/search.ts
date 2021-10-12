@@ -27,5 +27,5 @@ app.post('/search', async (req, res) => {
     `Returning ${products.results.length} products for user ${req.tokenData?.email} @ ${req.tokenData?.region} (out of a total of ${products.total})`
   );
 
-  res.json(products);
+  res.json(new ResponseData(false, `Returned ${products.results.length} products (total ${products.total})`, products));
 });

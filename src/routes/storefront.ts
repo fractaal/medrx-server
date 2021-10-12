@@ -20,5 +20,5 @@ app.get('/storefront', async (req, res) => {
 
   logger.log(`Returning ${products.length} products for user ${req.tokenData?.email} @ ${req.tokenData?.region}`);
 
-  res.json(products);
+  res.json(new ResponseData(false, 'Returned storefront', products));
 });
