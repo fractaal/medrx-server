@@ -18,7 +18,8 @@ app.post('/search', async (req, res) => {
 
   const products = await Product.query()
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-    .where('name', 'like', `%${req.body.searchTerm}%`)
+    .where('name', 'ilike', `%${req.body.searchTerm}%`)
+    .orWhere('description', 'ilike', `%${req.body.searchTerm}%`)
     .orderBy('updatedAt')
     .select(['name', 'price', 'description', 'id'])
     .page(req.body.pageNumber ?? 0, 10);
