@@ -42,6 +42,24 @@ export const migrations = [
       await knex.schema.withSchema(schema).dropTable('vendors');
     },
   },
+  {
+    description: 'Add prescriptions table and prescription-products table',
+    version: 2,
+    up: async (knex, schema) => {
+      await knex.schema.withSchema(schema).createTable('prescriptions', (t) => {
+        t.string('id').primary().notNullable();
+      });
+
+      await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
+        t.uuid('productId').references('id').inTable(`${schema}.products`);
+        t.uuid('prescriptionId').references('id').inTable(`${schema}.prescriptions`);
+      });
+    },
+    down: async (knex, schema) => {
+      await knex.schema.withSchema(schema).dropTable('prescriptions');
+      await knex.schema.withSchema(schema).dropTable('prescriptionsProducts');
+    },
+  },
 ] as Migration[];
 
 export type Migration = {
