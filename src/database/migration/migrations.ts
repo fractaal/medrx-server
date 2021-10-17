@@ -52,7 +52,7 @@ export const migrations = [
 
       await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
         t.uuid('productId').references('id').inTable(`${schema}.products`);
-        t.uuid('prescriptionId').references('id').inTable(`${schema}.prescriptions`);
+        t.string('prescriptionId').references('id').inTable(`${schema}.prescriptions`);
       });
     },
     down: async (knex, schema) => {
