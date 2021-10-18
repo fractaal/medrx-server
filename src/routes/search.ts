@@ -21,7 +21,6 @@ app.post('/search', async (req, res) => {
     .where('name', 'ilike', `%${req.body.searchTerm}%`)
     .orWhere('description', 'ilike', `%${req.body.searchTerm}%`)
     .orderBy('updatedAt')
-    .select(['name', 'price', 'description', 'id'])
     .page(req.body.pageNumber ?? 0, 10);
 
   logger.log(
