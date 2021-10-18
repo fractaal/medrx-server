@@ -51,8 +51,12 @@ export const migrations = [
       });
 
       await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
-        t.uuid('productId').references('id').inTable(`${schema}.products`);
-        t.string('prescriptionId').references('id').inTable(`${schema}.prescriptions`);
+        t.uuid('productId').references('id').inTable(`${schema}.products`).onUpdate('cascade').onDelete('cascade');
+        t.string('prescriptionId')
+          .references('id')
+          .inTable(`${schema}.prescriptions`)
+          .onUpdate('cascade')
+          .onDelete('cascade');
       });
     },
     down: async (knex, schema) => {
