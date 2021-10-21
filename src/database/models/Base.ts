@@ -5,18 +5,18 @@ import path from 'path';
 Model.knex(knex);
 
 export class Base extends Model {
-  updatedAt!: string;
-  createdAt!: string;
+  dateUpdated!: string;
+  dateCreated!: string;
 
   static get modelPaths() {
     return [__dirname];
   }
 
   $beforeUpdate() {
-    this.updatedAt = new Date().toISOString();
+    this.dateUpdated = new Date().toISOString();
   }
 
   $beforeInsert() {
-    this.createdAt = new Date().toISOString();
+    this.dateCreated = new Date().toISOString();
   }
 }
