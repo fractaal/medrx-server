@@ -17,8 +17,8 @@ export const migrations = [
 
         t.json('metadata');
 
-        t.timestamp('updatedAt');
-        t.timestamp('createdAt');
+        t.timestamp('dateUpdated');
+        t.timestamp('dateCreated');
       });
 
       await knex.schema.withSchema(schema).createTable('products', (t) => {
@@ -33,8 +33,8 @@ export const migrations = [
 
         t.string('photoUrl');
 
-        t.timestamp('updatedAt');
-        t.timestamp('createdAt');
+        t.timestamp('dateUpdated');
+        t.timestamp('dateCreated');
       });
     },
     down: async (knex, schema) => {
@@ -48,6 +48,8 @@ export const migrations = [
     up: async (knex, schema) => {
       await knex.schema.withSchema(schema).createTable('prescriptions', (t) => {
         t.string('id').primary().notNullable();
+        t.timestamp('dateUpdated');
+        t.timestamp('dateCreated');
       });
 
       await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
@@ -57,6 +59,15 @@ export const migrations = [
           .inTable(`${schema}.prescriptions`)
           .onUpdate('cascade')
           .onDelete('cascade');
+
+        t.boolean('isValid');
+        t.boolean('isConfirmed');
+
+        t.timestamp('dateSubmitted');
+        t.timestamp('dateConfirmedOrCancelled');
+
+        t.timestamp('dateUpdated');
+        t.timestamp('dateCreated');
       });
     },
     down: async (knex, schema) => {
