@@ -60,7 +60,7 @@ export const migrations = [
           .onUpdate('cascade')
           .onDelete('cascade');
 
-        t.boolean('isValid');
+        t.boolean('isValid').defaultTo(true);
         t.boolean('isConfirmed');
 
         t.timestamp('dateSubmitted');
