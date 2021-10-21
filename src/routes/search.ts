@@ -20,7 +20,7 @@ app.post('/search', async (req, res) => {
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
     .where('name', 'ilike', `%${req.body.searchTerm}%`)
     .orWhere('description', 'ilike', `%${req.body.searchTerm}%`)
-    .orderBy('updatedAt')
+    .orderBy('dateUpdated')
     .page(req.body.pageNumber ?? 0, 10);
 
   logger.log(

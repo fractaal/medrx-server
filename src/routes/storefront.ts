@@ -13,7 +13,7 @@ app.get('/storefront', async (req, res) => {
 
   const products = await Product.query()
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-    .orderBy('products.updatedAt')
+    .orderBy('products.dateUpdated')
     .select([
       'products.name',
       'price',
