@@ -2,6 +2,7 @@ import { app } from '..';
 import Logger from '../logger';
 import ResponseData from '../objects/response-data';
 import Product from '../database/models/Product';
+import Vendor from '../database/models/Vendor';
 
 const logger = Logger('Product');
 
@@ -16,13 +17,24 @@ app.get('/product/:id', async (req, res) => {
     return;
   }
 
-  const product = await Product.query()
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-    .findById(req.params.id);
+  try {
+    const product = await Product.query()
+      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+      .findById(req.params.id);
 
-  if (product) res.json(new ResponseData(false, 'Product successfully retrieved', product));
-  else res.json(new ResponseData(false, 'No such product with supplied ID', null));
+    const vendor = (await product
+      .$relatedQuery('vendor')
+      .select('name')
+      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())) as unknown as Vendor;
 
-  logger.log(`Returning ${req.params.id} product for user ${req.tokenData?.email} @ ${req.tokenData?.region}`);
-  // res.json(products);
+    if (product)
+      res.json(new ResponseData(false, 'Product successfully retrieved', { ...product, vendorName: vendor.name }));
+    else res.json(new ResponseData(false, 'No such product with supplied ID', null));
+
+    logger.log(`Returning ${req.params.id} product for user ${req.tokenData?.email} @ ${req.tokenData?.region}`);
+    // res.json(products);
+  } catch (err) {
+    res.json(new ResponseData(true, 'Something went wrong with your request', null));
+    logger.log(`Failed to process request for ${req.tokenData?.email} - ${(err as Error).message}`);
+  }
 });
