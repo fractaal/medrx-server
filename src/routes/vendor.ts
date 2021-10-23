@@ -6,7 +6,7 @@ import Vendor from '../database/models/Vendor';
 
 const logger = Logger('Vendor');
 
-app.get('/vendor/:id', async (req, res) => {
+app.get('/vendor/:id/:pageNumber', async (req, res) => {
   if (!req.isAuthenticated) {
     res.status(401).json(new ResponseData(true, 'You are not logged in!'));
     return;
@@ -25,7 +25,7 @@ app.get('/vendor/:id', async (req, res) => {
     const products = await vendor
       .$relatedQuery('product')
       .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-      .page(req.body.pageNumber ?? 0, 10);
+      .page(parseInt(req.params.pageNumber ?? 0), 10);
 
     if (vendor) res.json(new ResponseData(false, 'Vendor successfully retrieved', { vendor, products }));
     else res.json(new ResponseData(false, 'No such vendor with supplied ID', null));
