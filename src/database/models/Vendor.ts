@@ -19,7 +19,7 @@ export default class Vendor extends Base {
 
   static get relationMappings() {
     return {
-      vendor: {
+      product: {
         relation: Model.HasManyRelation,
         modelClass: 'Product',
         join: {
