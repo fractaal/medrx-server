@@ -9,11 +9,11 @@ export const migrations = [
         t.uuid('id').primary().notNullable().defaultTo(knex.raw('gen_random_uuid()'));
 
         t.string('name').notNullable();
-        t.string('content', 1000);
+        t.string('content', 5000);
         t.string('city').notNullable();
         t.integer('rating');
 
-        t.string('photoUrl');
+        t.string('photoUrl', 1000);
 
         t.json('metadata');
 
@@ -26,12 +26,12 @@ export const migrations = [
         t.uuid('vendorId').references('id').inTable(`${schema}.vendors`);
 
         t.string('name').notNullable();
-        t.string('description');
+        t.string('description', 5000);
         t.integer('price').notNullable();
         t.json('metadata');
         t.boolean('isPrescriptionRequired').notNullable();
 
-        t.string('photoUrl');
+        t.string('photoUrl', 1000);
 
         t.timestamp('dateUpdated');
         t.timestamp('dateCreated');
