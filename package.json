@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "node build.js",
+    "build": "node build.js && cp src/seeder/*.txt dist/seeder/",
+    "ld": "copy src\\seeder\\*.txt dist\\seeder\\ && tsc -w",
     "start": "node dist/"
   },
   "dependencies": {
