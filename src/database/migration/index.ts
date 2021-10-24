@@ -71,6 +71,7 @@ const createMetadataTable = async (schema: string) => {
       t.increments('id').primary();
     });
     await knex('metadata').withSchema(schema).insert({ key: 'schemaVersion', value: '0' }).then();
+    await knex('metadata').withSchema(schema).insert({ key: 'seeded', value: 'false' }).then();
   } else {
     logger.log(`${schema} looks like a compatible schema.`);
   }
