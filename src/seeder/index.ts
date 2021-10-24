@@ -4,7 +4,7 @@ import faker from 'faker';
 import Logger from '../logger';
 import fs from 'fs';
 import path from 'path';
-import knex from 'knex';
+import { knex } from '../database';
 
 const log = Logger('Seeder');
 
@@ -15,9 +15,9 @@ const watsonsDesc = fs.readFileSync(path.resolve(__dirname, 'watsons.txt'), { en
 
 export default async () => {
   const hasAlreadyBeenSeeded =
-    (await knex('metadata').withSchema('REGION_X').where({ key: 'seeded' }).first()).value ?? 0;
+    (await knex('metadata').withSchema('REGION_X').where({ key: 'seeded' }).first())?.value ?? 'false';
 
-  if (hasAlreadyBeenSeeded) {
+  if (hasAlreadyBeenSeeded == 'true') {
     log.log('Database has already been seeded! Cancelling...');
     return;
   }
@@ -64,12 +64,12 @@ export default async () => {
   ];
 
   for (let i = 0; i < 100; i++) {
-    const idx = Math.round(Math.random() * vendors.length - 1);
+    const idx = Math.floor(Math.random() * (vendors.length - 1));
     const vendor = vendors[idx];
     log.log(`Foreign key ${vendor.id}`);
 
-    const productName = names[Math.round(Math.random() * names.length - 1)];
-    const photoUrl = photoUrls[Math.round(Math.random() * photoUrls.length - 1)];
+    const productName = names[Math.floor(Math.random() * (names.length - 1))];
+    const photoUrl = photoUrls[Math.floor(Math.random() * (photoUrls.length - 1))];
 
     const toInsert = {
       name: `${vendor.name} - ${productName}`,
@@ -85,7 +85,7 @@ export default async () => {
     await Product.query().withSchema('REGION_X').insert(toInsert);
   }
 
-  await knex('metadata').withSchema('REGION_X').where({ key: 'seeded' }).first().update({ value: 1 });
+  await knex('metadata').withSchema('REGION_X').where({ key: 'seeded' }).first().update({ value: 'true' });
 
   log.success('Seed complete');
 };
