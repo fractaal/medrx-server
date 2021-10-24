@@ -21,6 +21,7 @@ app.use(cors());
   import('./routes/product');
   import('./routes/prescription');
   import('./routes/vendor');
+  import('./routes/order');
 
   app.listen(process.env.PORT ?? 80);
 
