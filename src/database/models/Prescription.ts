@@ -3,6 +3,14 @@ import { Base } from './Base';
 
 export default class Prescription extends Base {
   id!: string;
+  userId!: string;
+
+  isValid!: boolean;
+  isConfirmed!: boolean;
+
+  dateSubmitted!: string;
+  dateConfirmedOrCancelled!: string;
+
   static get tableName() {
     return 'prescriptions';
   }

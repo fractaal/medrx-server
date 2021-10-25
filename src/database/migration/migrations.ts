@@ -47,24 +47,26 @@ export const migrations = [
     version: 2,
     up: async (knex, schema) => {
       await knex.schema.withSchema(schema).createTable('prescriptions', (t) => {
-        t.string('id').primary().notNullable();
+        // t.string('id').primary().notNullable();
+        t.uuid('id').primary().notNullable().defaultTo(knex.raw('gen_random_uuid()'));
+        t.string('userId').notNullable();
         t.timestamp('dateUpdated');
         t.timestamp('dateCreated');
-      });
-
-      await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
-        t.uuid('productId').references('id').inTable(`${schema}.products`).onUpdate('cascade').onDelete('cascade');
-        t.string('prescriptionId')
-          .references('id')
-          .inTable(`${schema}.prescriptions`)
-          .onUpdate('cascade')
-          .onDelete('cascade');
 
         t.boolean('isValid').defaultTo(true);
         t.boolean('isConfirmed');
 
         t.timestamp('dateSubmitted');
         t.timestamp('dateConfirmedOrCancelled');
+      });
+
+      await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
+        t.uuid('productId').references('id').inTable(`${schema}.products`).onUpdate('cascade').onDelete('cascade');
+        t.uuid('prescriptionId')
+          .references('id')
+          .inTable(`${schema}.prescriptions`)
+          .onUpdate('cascade')
+          .onDelete('cascade');
 
         t.timestamp('dateUpdated');
         t.timestamp('dateCreated');
