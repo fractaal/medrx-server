@@ -53,6 +53,8 @@ export const migrations = [
         t.timestamp('dateUpdated');
         t.timestamp('dateCreated');
 
+        t.json('products');
+
         t.boolean('isValid').defaultTo(true);
         t.boolean('isConfirmed');
 
@@ -60,21 +62,21 @@ export const migrations = [
         t.timestamp('dateConfirmedOrCancelled');
       });
 
-      await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
-        t.uuid('productId').references('id').inTable(`${schema}.products`).onUpdate('cascade').onDelete('cascade');
-        t.uuid('prescriptionId')
-          .references('id')
-          .inTable(`${schema}.prescriptions`)
-          .onUpdate('cascade')
-          .onDelete('cascade');
+      // await knex.schema.withSchema(schema).createTable('prescriptionsProducts', (t) => {
+      //   t.uuid('productId').references('id').inTable(`${schema}.products`).onUpdate('cascade').onDelete('cascade');
+      //   t.uuid('prescriptionId')
+      //     .references('id')
+      //     .inTable(`${schema}.prescriptions`)
+      //     .onUpdate('cascade')
+      //     .onDelete('cascade');
 
-        t.timestamp('dateUpdated');
-        t.timestamp('dateCreated');
-      });
+      //   t.timestamp('dateUpdated');
+      //   t.timestamp('dateCreated');
+      // });
     },
     down: async (knex, schema) => {
       await knex.schema.withSchema(schema).dropTable('prescriptions');
-      await knex.schema.withSchema(schema).dropTable('prescriptionsProducts');
+      // await knex.schema.withSchema(schema).dropTable('prescriptionsProducts');
     },
   },
 ] as Migration[];
