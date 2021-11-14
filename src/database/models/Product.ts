@@ -29,18 +29,18 @@ export default class Product extends Base {
           to: 'vendors.id',
         },
       },
-      prescription: {
-        relation: Model.ManyToManyRelation,
-        modelClass: 'Prescription',
-        join: {
-          from: 'products.id',
-          through: {
-            from: 'prescriptionProducts.productId',
-            to: 'prescriptionProducts.prescriptionId',
-          },
-          to: 'prescriptions.id',
-        },
-      },
+      // prescription: {
+      //   relation: Model.ManyToManyRelation,
+      //   modelClass: 'Prescription',
+      //   join: {
+      //     from: 'products.id',
+      //     through: {
+      //       from: 'prescriptionProducts.productId',
+      //       to: 'prescriptionProducts.prescriptionId',
+      //     },
+      //     to: 'prescriptions.id',
+      //   },
+      // },
     };
   }
 }
