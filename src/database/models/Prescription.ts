@@ -1,5 +1,6 @@
 import { Model } from 'objection';
 import { Base } from './Base';
+import Product from './Product';
 
 export default class Prescription extends Base {
   id!: string;
@@ -10,6 +11,8 @@ export default class Prescription extends Base {
 
   dateSubmitted!: string;
   dateConfirmedOrCancelled!: string;
+
+  products!: Product[];
 
   static get tableName() {
     return 'prescriptions';
@@ -29,18 +32,18 @@ export default class Prescription extends Base {
           to: 'vendors.id',
         },
       },
-      product: {
-        relation: Model.ManyToManyRelation,
-        modelClass: 'Product',
-        join: {
-          from: 'prescriptions.id',
-          through: {
-            from: 'prescriptionsProducts.prescriptionId',
-            to: 'prescriptionsProducts.productId',
-          },
-          to: 'products.id',
-        },
-      },
+      // product: {
+      //   relation: Model.ManyToManyRelation,
+      //   modelClass: 'Product',
+      //   join: {
+      //     from: 'prescriptions.id',
+      //     through: {
+      //       from: 'prescriptionsProducts.prescriptionId',
+      //       to: 'prescriptionsProducts.productId',
+      //     },
+      //     to: 'products.id',
+      //   },
+      // },
     };
   }
 }
