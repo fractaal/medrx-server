@@ -36,10 +36,7 @@ const controller = async (req: Request, res: Response, latest = false) => {
     return;
   }
 
-  const results = await prescription
-    .$relatedQuery('product')
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-    .select('name', 'vendorId', 'description', 'price', 'photoUrl');
+  const results = prescription.products;
 
   res.json(new ResponseData(false, `Got ${results.length} items`, results));
 };
@@ -85,3 +82,30 @@ app.get('/prescription/cancel', async (req, res) => {
 
 app.get('/prescription/latest', async (req, res) => controller(req, res, true));
 app.get('/prescription/:id', async (req, res) => controller(req, res));
+
+app.post('/prescription/', async (req, res) => {
+  if (!req.tokenData?.roles.includes('pharmacist')) {
+    logger.warn(`User ${req.tokenData?.email} tried to create a prescription, but they are not a pharmacist.`);
+    res.status(401).json(new ResponseData(true, 'User is not a pharmacist.'));
+    return;
+  }
+
+  if (!Array.isArray(req.body.products) || req.body.userId) {
+    logger.warn(
+      `User ${req.tokenData?.email} tried to create a prescription, but they did not provide the correct data.`
+    );
+    res.status(400).json(new ResponseData(true, 'User did not provide the correct data.'));
+    return;
+  }
+
+  const prescription = await Prescription.query().insert({
+    dateSubmitted: new Date().toISOString(),
+    userId: req.body.userId,
+    products: req.body.products,
+    isValid: true,
+    isConfirmed: false,
+  });
+
+  logger.log(`Pharmacist ${req.tokenData?.email} created a prescription ${prescription.id} for ${req.body.userId}`);
+  res.json(new ResponseData(false, 'Created a prescription', prescription));
+});
