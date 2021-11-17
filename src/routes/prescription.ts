@@ -5,6 +5,10 @@ import Prescription from '../database/models/Prescription';
 import { database } from 'firebase-admin';
 import { Response, Request } from 'express';
 
+// TODO: Use express validator in other routes?
+import { body } from 'express-validator';
+import validationHandler from '../util/validation-handler';
+
 const logger = Logger('Prescription');
 
 // TODO: Actually do this
@@ -83,29 +87,57 @@ app.get('/prescription/cancel', async (req, res) => {
 app.get('/prescription/latest', async (req, res) => controller(req, res, true));
 app.get('/prescription/:id', async (req, res) => controller(req, res));
 
-app.post('/prescription/', async (req, res) => {
-  if (!req.tokenData?.roles.includes('pharmacist')) {
-    logger.warn(`User ${req.tokenData?.email} tried to create a prescription, but they are not a pharmacist.`);
-    res.status(401).json(new ResponseData(true, 'User is not a pharmacist.'));
-    return;
+app.post(
+  '/prescription/',
+
+  body('products').isArray(), //
+  body('userId').isString(),
+
+  async (req, res) => {
+    if (!req.tokenData?.roles.includes('pharmacist')) {
+      logger.warn(`User ${req.tokenData?.email} tried to create a prescription, but they are not a pharmacist.`);
+      res.status(401).json(new ResponseData(true, 'User is not a pharmacist.'));
+      return;
+    }
+
+    // @ts-ignore - stupid request body ts compiler error.
+    if (!validationHandler(req, res)) return;
+
+    // req.body.products is an array of { productId: string, productQuantity: number }. Verify validity of data.
+    req.body.products.forEach((product: { productId: string; productQuantity: number }) => {
+      if (!product.productId || !product.productQuantity) {
+        logger.warn(
+          `User ${req.tokenData?.email} tried to create a prescription, but they did not provide the correct data.`
+        );
+        res.status(400).json(new ResponseData(true, 'User did not provide the correct data.'));
+        return;
+      }
+    });
+
+    // Update firebase database prescription request to confirmed
+    try {
+      database()
+        .ref(`/${req.tokenData?.region}/${req.tokenData?.city}/${req.tokenData?.uid}/prescriptionRequests`)
+        .update({
+          status: 'OK',
+        });
+    } catch (err) {
+      logger.error(
+        `Pharmacist ${req.tokenData.email} tried to create a prescription for ${req.body.userId}, but an error occured trying to update Firebase: ${err}`
+      );
+      res.status(500).json(new ResponseData(true, 'An error occured on our end. Please try again.'));
+      return;
+    }
+
+    const prescription = await Prescription.query().insert({
+      dateSubmitted: new Date().toISOString(),
+      userId: req.body.userId,
+      products: req.body.products,
+      isValid: true,
+      isConfirmed: false,
+    });
+
+    logger.log(`Pharmacist ${req.tokenData?.email} created a prescription ${prescription.id} for ${req.body.userId}`);
+    res.json(new ResponseData(false, 'Created a prescription', prescription));
   }
-
-  if (!Array.isArray(req.body.products) || req.body.userId) {
-    logger.warn(
-      `User ${req.tokenData?.email} tried to create a prescription, but they did not provide the correct data.`
-    );
-    res.status(400).json(new ResponseData(true, 'User did not provide the correct data.'));
-    return;
-  }
-
-  const prescription = await Prescription.query().insert({
-    dateSubmitted: new Date().toISOString(),
-    userId: req.body.userId,
-    products: req.body.products,
-    isValid: true,
-    isConfirmed: false,
-  });
-
-  logger.log(`Pharmacist ${req.tokenData?.email} created a prescription ${prescription.id} for ${req.body.userId}`);
-  res.json(new ResponseData(false, 'Created a prescription', prescription));
-});
+);
