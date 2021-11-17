@@ -23,7 +23,7 @@ app.use(cors());
   import('./routes/vendor');
   // import('./routes/order');
 
-  app.listen(process.env.PORT ?? 80);
+  app.listen(process.env.PORT ?? 3000);
 
   // Seeder!!!
   if (process.env.SEED) {
