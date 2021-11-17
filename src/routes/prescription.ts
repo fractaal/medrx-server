@@ -129,13 +129,15 @@ app.post(
       return;
     }
 
-    const prescription = await Prescription.query().insert({
-      dateSubmitted: new Date().toISOString(),
-      userId: req.body.userId,
-      products: req.body.products,
-      isValid: true,
-      isConfirmed: false,
-    });
+    const prescription = await Prescription.query()
+      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+      .insert({
+        dateSubmitted: new Date().toISOString(),
+        userId: req.body.userId,
+        products: JSON.stringify(req.body.products),
+        isValid: true,
+        isConfirmed: false,
+      });
 
     logger.log(`Pharmacist ${req.tokenData?.email} created a prescription ${prescription.id} for ${req.body.userId}`);
     res.json(new ResponseData(false, 'Created a prescription', prescription));
