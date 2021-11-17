@@ -12,7 +12,7 @@ export default class Prescription extends Base {
   dateSubmitted!: string;
   dateConfirmedOrCancelled!: string;
 
-  products!: Product[];
+  products!: any[];
 
   static get tableName() {
     return 'prescriptions';
