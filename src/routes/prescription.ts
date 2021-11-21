@@ -136,7 +136,7 @@ app.get('/prescription/latest', async (req, res) => readController(req, res, tru
 app.get('/prescription/:id', async (req, res) => readController(req, res));
 
 // Update controllers (Confirm)
-app.get('/prescription/confirm', async (req, res) => {
+app.patch('/prescription/confirm', async (req, res) => {
   const latestPrescription = await Prescription.query()
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
     .orderBy('dateCreated')
@@ -147,6 +147,11 @@ app.get('/prescription/confirm', async (req, res) => {
     res.status(401).json(new ResponseData(true, 'User does not have a valid prescription.'));
     return;
   }
+
+  await latestPrescription
+    .$query()
+    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .patch({ isValid: false, isConfirmed: true, dateConfirmedOrCancelled: new Date().toISOString() });
 
   database().ref(`/${req.tokenData?.region}/${req.tokenData?.city}/${req.tokenData?.uid}/deliveries`).set({
     __dummy: true,
@@ -161,7 +166,7 @@ app.get('/prescription/confirm', async (req, res) => {
 });
 
 // Update controllers (cancel)
-app.get('/prescription/cancel', async (req, res) => {
+app.patch('/prescription/cancel', async (req, res) => {
   const latestPrescription = await Prescription.query()
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
     .orderBy('dateCreated')
@@ -173,7 +178,10 @@ app.get('/prescription/cancel', async (req, res) => {
     return;
   }
 
-  latestPrescription.$query().patch({ isValid: false });
+  await latestPrescription
+    .$query()
+    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .patch({ isValid: false, isConfirmed: false, dateConfirmedOrCancelled: new Date().toISOString() });
   logger.log(`User ${req.tokenData?.email} cancelled a prescription ${latestPrescription.id}.`);
   res.json(new ResponseData(false, 'Cancelled this prescription'));
 });
