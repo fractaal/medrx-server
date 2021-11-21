@@ -79,6 +79,20 @@ export const migrations = [
       // await knex.schema.withSchema(schema).dropTable('prescriptionsProducts');
     },
   },
+  {
+    description: 'Add extra remarks field to prescriptions table',
+    version: 3,
+    up: async (knex, schema) => {
+      await knex.schema.withSchema(schema).table('prescriptions', (t) => {
+        t.string('remarks');
+      });
+    },
+    down: async (knex, schema) => {
+      await knex.schema.withSchema(schema).table('prescriptions', (t) => {
+        t.dropColumn('remarks');
+      });
+    },
+  },
 ] as Migration[];
 
 export type Migration = {
