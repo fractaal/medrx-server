@@ -28,6 +28,7 @@ app.post(
 
   body('products').isArray(), //
   body('userId').isString(),
+  body('extraRemarks').isString(),
 
   async (req, res) => {
     // Validation handler
@@ -101,6 +102,7 @@ app.post(
         products: JSON.stringify(cartItems),
         isValid: true,
         isConfirmed: false,
+        extraRemarks: req.body.extraRemarks,
       });
 
     logger.log(`Pharmacist ${req.tokenData?.email} created a prescription ${prescription.id} for ${req.body.userId}`);
@@ -149,7 +151,9 @@ app.get('/prescription/confirm', async (req, res) => {
   database().ref(`/${req.tokenData?.region}/${req.tokenData?.city}/${req.tokenData?.uid}/deliveries`).set({
     __dummy: true,
     isAccepted: false,
+    products: latestPrescription.products,
   });
+
   logger.log(
     `User ${req.tokenData?.email} confirmed a prescription ${latestPrescription.id} and has put out a delivery request.`
   );
