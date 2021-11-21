@@ -1,3 +1,4 @@
+import checkAuth from '../util/check-auth';
 import { app } from '..';
 import Logger from '../logger';
 import ResponseData from '../objects/response-data';
@@ -6,12 +7,7 @@ import Vendor from '../database/models/Vendor';
 
 const logger = Logger('Product');
 
-app.get('/product/:id', async (req, res) => {
-  if (!req.isAuthenticated) {
-    res.status(401).json(new ResponseData(true, 'You are not logged in!'));
-    return;
-  }
-
+app.get('/product/:id', checkAuth, async (req, res) => {
   if (!req.params.id) {
     res.status(400).json(new ResponseData(true, 'You did not specify product ID!'));
     return;
@@ -21,6 +17,11 @@ app.get('/product/:id', async (req, res) => {
     const product = await Product.query()
       .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
       .findById(req.params.id);
+
+    if (!product) {
+      res.status(404).json(new ResponseData(true, 'Product not found!'));
+      return;
+    }
 
     const vendor = (await product
       .$relatedQuery('vendor')
