@@ -2,6 +2,7 @@ import { app } from '..';
 import Logger from '../logger';
 import ResponseData from '../objects/response-data';
 import Prescription from '../database/models/Prescription';
+import { CartItem } from '../database/models/CartItem';
 import { database } from 'firebase-admin';
 import { Response, Request } from 'express';
 
@@ -56,7 +57,7 @@ app.post(
       return;
     }
 
-    const cartItems: any[] = [];
+    const cartItems: CartItem[] = [];
 
     // Further data validation
     // req.body.products is an array of { productId: string, productQuantity: number }. Verify validity of data.
