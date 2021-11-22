@@ -93,6 +93,33 @@ export const migrations = [
       });
     },
   },
+  {
+    description: 'Add orders table',
+    version: 4,
+    up: async (knex, schema) => {
+      await knex.schema.withSchema(schema).createTable('orders', (t) => {
+        t.uuid('id').primary().notNullable().defaultTo(knex.raw('gen_random_uuid()'));
+
+        t.timestamp('dateCreated');
+        t.timestamp('dateUpdated');
+
+        t.string('userId').notNullable();
+        t.uuid('prescriptionId')
+          .references('id')
+          .inTable(`${schema}.prescriptions`)
+          .nullable()
+          .onUpdate('cascade')
+          .onDelete('cascade');
+
+        t.boolean('isActive').defaultTo(false);
+        t.json('products');
+        t.string('status');
+      });
+    },
+    down: async (knex, schema) => {
+      await knex.schema.withSchema(schema).dropTable('orders');
+    },
+  },
 ] as Migration[];
 
 export type Migration = {
