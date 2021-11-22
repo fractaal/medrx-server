@@ -2,7 +2,7 @@ import { Model } from 'objection';
 import { Base } from './Base';
 
 export default class Product extends Base {
-  id!: number;
+  id!: string;
   vendorId!: number;
 
   name!: string;
