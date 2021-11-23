@@ -7,5 +7,4 @@ export interface CartItem {
   productName: string;
   productQuantity: number;
   productPrice: number;
-  amount: number;
 }
