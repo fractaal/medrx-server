@@ -10,6 +10,7 @@ import { Response, Request } from 'express';
 import { body } from 'express-validator';
 import validationHandler from '../util/validation-handler';
 import Product from '../database/models/Product';
+import { createOrderAndDeliveryRequest } from './order';
 
 const logger = Logger('Prescription');
 
@@ -154,11 +155,21 @@ app.patch('/prescription/confirm', async (req, res) => {
     .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
     .patch({ isValid: false, isConfirmed: true, dateConfirmedOrCancelled: new Date().toISOString() });
 
-  database().ref(`/${req.tokenData?.region}/${req.tokenData?.city}/${req.tokenData?.uid}/deliveries`).set({
-    __dummy: true,
-    isAccepted: false,
-    products: latestPrescription.products,
-  });
+  try {
+    await createOrderAndDeliveryRequest(
+      req.tokenData!.uid,
+      latestPrescription.products,
+      req.tokenData!.region,
+      req.tokenData!.city,
+      latestPrescription.id
+    );
+  } catch (err) {
+    logger.error(
+      `User ${req.tokenData?.email} tried to confirm a prescription, but an error occured trying to create an order: ${err}`
+    );
+    res.status(500).json(new ResponseData(true, 'An error occured on our end. Please try again.'));
+    return;
+  }
 
   logger.log(
     `User ${req.tokenData?.email} confirmed a prescription ${latestPrescription.id} and has put out a delivery request.`
