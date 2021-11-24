@@ -2,6 +2,7 @@ import { app } from '..';
 import Logger from '../logger';
 import ResponseData from '../objects/response-data';
 import Product from '../database/models/Product';
+import { regionClaimsToSchema } from '../util/name-transforms';
 
 const logger = Logger('Search');
 
@@ -17,7 +18,7 @@ app.post('/search', async (req, res) => {
   }
 
   const products = await Product.query()
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .withSchema(regionClaimsToSchema(req.tokenData!.region))
     .where('name', 'ilike', `%${req.body.searchTerm}%`)
     .orWhere('description', 'ilike', `%${req.body.searchTerm}%`)
     .orderBy('dateUpdated')
