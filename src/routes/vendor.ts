@@ -4,6 +4,7 @@ import ResponseData from '../objects/response-data';
 import Product from '../database/models/Product';
 import Vendor from '../database/models/Vendor';
 import checkAuth from '../util/check-auth';
+import { regionClaimsToSchema } from '../util/name-transforms';
 
 const logger = Logger('Vendor');
 
@@ -14,9 +15,7 @@ app.get('/vendor/:id', checkAuth, async (req, res) => {
   }
 
   try {
-    const vendor = await Vendor.query()
-      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
-      .findById(req.params.id);
+    const vendor = await Vendor.query().withSchema(regionClaimsToSchema(req.tokenData!.region)).findById(req.params.id);
 
     if (vendor) res.json(new ResponseData(false, 'Vendor successfully retrieved', vendor));
     else res.json(new ResponseData(false, 'No such vendor with supplied ID', null));
@@ -37,7 +36,7 @@ app.get('/vendor/:id/products/:pageNumber', checkAuth, async (req, res) => {
 
   try {
     const products = await Product.query()
-      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))
       .where({ vendorId: req.params.id })
       .page(parseInt(req.params.pageNumber ?? 0), 10);
 
