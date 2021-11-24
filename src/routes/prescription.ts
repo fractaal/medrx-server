@@ -1,16 +1,20 @@
 import { app } from '..';
 import Logger from '../logger';
+
 import ResponseData from '../objects/response-data';
 import Prescription from '../database/models/Prescription';
 import { CartItem } from '../database/models/CartItem';
+import Product from '../database/models/Product';
+
 import { database } from 'firebase-admin';
 import { Response, Request } from 'express';
+import { regionClaimsToSchema } from '../util/name-transforms';
 
 // TODO: Use express validator in other routes?
 import { body } from 'express-validator';
 import validationHandler from '../util/validation-handler';
-import Product from '../database/models/Product';
-import { createOrderAndDeliveryRequest } from './order';
+
+import { createOrderAndDeliveryRequest } from '../api/order-and-delivery-request';
 
 const logger = Logger('Prescription');
 
@@ -46,7 +50,7 @@ app.post(
 
     // Find if an already existing latest prescription is valid
     const latestPrescription = await Prescription.query()
-      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))
       .orderBy('dateCreated')
       .first();
 
@@ -65,7 +69,7 @@ app.post(
     // TODO: This can be optimized by awaiting all promises at once.
     for (const product of req.body.products) {
       const dbProduct = await Product.query()
-        .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+        .withSchema(regionClaimsToSchema(req.tokenData!.region))
         .findById(product.productId);
 
       if (!dbProduct) {
@@ -97,7 +101,7 @@ app.post(
     }
 
     const prescription = await Prescription.query()
-      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))
       .insert({
         dateSubmitted: new Date().toISOString(),
         userId: req.body.userId,
@@ -114,7 +118,7 @@ app.post(
 
 // Read controllers
 const readController = async (req: Request, res: Response, latest = false) => {
-  const prescriptionPromise = Prescription.query().withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase());
+  const prescriptionPromise = Prescription.query().withSchema(regionClaimsToSchema(req.tokenData!.region));
   // .orderBy('dateCreated')
   // .first();
 
@@ -140,7 +144,7 @@ app.get('/prescription/:id', async (req, res) => readController(req, res));
 // Update controllers (Confirm)
 app.patch('/prescription/confirm', async (req, res) => {
   const latestPrescription = await Prescription.query()
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .withSchema(regionClaimsToSchema(req.tokenData!.region))
     .orderBy('dateCreated')
     .first();
 
@@ -152,7 +156,7 @@ app.patch('/prescription/confirm', async (req, res) => {
 
   await latestPrescription
     .$query()
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .withSchema(regionClaimsToSchema(req.tokenData!.region))
     .patch({ isValid: false, isConfirmed: true, dateConfirmedOrCancelled: new Date().toISOString() });
 
   try {
@@ -180,7 +184,7 @@ app.patch('/prescription/confirm', async (req, res) => {
 // Update controllers (cancel)
 app.patch('/prescription/cancel', async (req, res) => {
   const latestPrescription = await Prescription.query()
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .withSchema(regionClaimsToSchema(req.tokenData!.region))
     .orderBy('dateCreated')
     .first();
 
@@ -192,7 +196,7 @@ app.patch('/prescription/cancel', async (req, res) => {
 
   await latestPrescription
     .$query()
-    .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+    .withSchema(regionClaimsToSchema(req.tokenData!.region))
     .patch({ isValid: false, isConfirmed: false, dateConfirmedOrCancelled: new Date().toISOString() });
   logger.log(`User ${req.tokenData?.email} cancelled a prescription ${latestPrescription.id}.`);
   res.json(new ResponseData(false, 'Cancelled this prescription'));
@@ -204,7 +208,7 @@ app.delete('/prescription/:id', async (req, res) => {
   try {
     await Prescription.transaction(async (trx) => {
       const numDeleted = await Prescription.query(trx)
-        .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+        .withSchema(regionClaimsToSchema(req.tokenData!.region))
         .delete()
         .where({ id: req.params.id, userId: req.tokenData?.uid })
         .first();

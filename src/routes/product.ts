@@ -4,6 +4,7 @@ import Logger from '../logger';
 import ResponseData from '../objects/response-data';
 import Product from '../database/models/Product';
 import Vendor from '../database/models/Vendor';
+import { regionClaimsToSchema } from '../util/name-transforms';
 
 const logger = Logger('Product');
 
@@ -15,7 +16,7 @@ app.get('/product/:id', checkAuth, async (req, res) => {
 
   try {
     const product = await Product.query()
-      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))
       .findById(req.params.id);
 
     if (!product) {
@@ -26,7 +27,7 @@ app.get('/product/:id', checkAuth, async (req, res) => {
     const vendor = (await product
       .$relatedQuery('vendor')
       .select('name')
-      .withSchema(req.tokenData!.region.replace(/ /g, '_').toUpperCase())) as unknown as Vendor;
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))) as unknown as Vendor;
 
     if (product)
       res.json(new ResponseData(false, 'Product successfully retrieved', { ...product, vendorName: vendor.name }));
