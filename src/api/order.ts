@@ -7,21 +7,26 @@ import { getDeliveryRequestDbRef } from './delivery-request';
 const logger = Logger('Order API');
 
 export const createOrder = async (userId: string, products: CartItem[], region: string, prescriptionId?: string) => {
-  const order = await Order.query().withSchema(regionClaimsToSchema(region)).insert({
-    userId,
-    prescriptionId,
-    products,
-    status: 'undetermined',
-    isActive: true,
-  });
+  const order = await Order.query()
+    .withSchema(regionClaimsToSchema(region))
+    .insert({
+      userId,
+      prescriptionId,
+      products: JSON.stringify(products),
+      status: 'undetermined',
+      isActive: true,
+    });
   return order;
 };
 
 export const getOrder = async (orderId: string, userId: string, region: string) =>
   await Order.query().withSchema(regionClaimsToSchema(region)).findOne({ userId, id: orderId });
 
-export const getOrderByPrescription = async (prescriptionId: string) => {
-  return await Order.query().findOne({ prescriptionId });
+export const getOrdersPaginated = async (pageSize: number, pageNumber: number, userId: string, region: string) =>
+  await Order.query().withSchema(regionClaimsToSchema(region)).where({ userId }).page(pageNumber, pageSize);
+
+export const getOrderByPrescription = async (prescriptionId: string, region: string) => {
+  return await Order.query().withSchema(regionClaimsToSchema(region)).findOne({ prescriptionId });
 };
 
 export const deleteOrder = async (orderId: string, userId: string, region: string, city: string) => {
@@ -38,4 +43,11 @@ export const deleteOrder = async (orderId: string, userId: string, region: strin
   }
 
   await order.$query().withSchema(regionClaimsToSchema(region)).delete();
+};
+
+export const countActiveOrders = async (userId: string, region: string, city: string) => {
+  // @ts-ignore
+  return parseInt(
+    (await Order.query().withSchema(regionClaimsToSchema(region)).where({ userId, isActive: true }).count())[0].count
+  );
 };
