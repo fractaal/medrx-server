@@ -6,6 +6,7 @@ import checkAuth from '../util/check-auth';
 import ResponseData from '../objects/response-data';
 
 import { createOrderAndDeliveryRequest } from '../api/order-and-delivery-request';
+import { getOrdersPaginated } from '../api/order';
 
 const logger = Logger('Order Route');
 
@@ -44,3 +45,21 @@ app.post(
     }
   }
 );
+
+app.get('/orders/:pageSize/:pageNumber', checkAuth, async (req, res) => {
+  try {
+    const result = await getOrdersPaginated(
+      parseInt(req.params.pageSize),
+      parseInt(req.params.pageNumber),
+      req.tokenData!.uid,
+      req.tokenData!.region
+    );
+    res.json(
+      new ResponseData(false, `Returning ${result.results.length} orders out of a total of ${result.total}`, result)
+    );
+  } catch (err) {
+    const e: Error = err as unknown as Error;
+    logger.error(e);
+    res.status(500).json(new ResponseData(true, 'An error occured.'));
+  }
+});
