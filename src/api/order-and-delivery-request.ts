@@ -2,7 +2,7 @@ import { database } from 'firebase-admin';
 import Order from '../database/models/Order';
 import { CartItem } from '../database/models/CartItem';
 import { createDeliveryRequest, deleteDeliveryRequest, getDeliveryRequestDbRef } from './delivery-request';
-import { createOrder, deleteOrder, getOrder, getOrderByPrescription } from './order';
+import { countActiveOrders, createOrder, deleteOrder, getOrder, getOrderByPrescription } from './order';
 
 import Logger from '../logger';
 import { regionClaimsToSchema } from '../util/name-transforms';
@@ -17,8 +17,12 @@ export const createOrderAndDeliveryRequest = async (
   prescriptionId?: string
 ): Promise<void> => {
   //
-  const existingOrder = await getOrderByPrescription(prescriptionId ?? '');
+  const existingOrder = await getOrderByPrescription(prescriptionId ?? '', region);
   const existingDeliveryRequest = (await (await getDeliveryRequestDbRef(userId, region, city)).get()).val();
+
+  if ((await countActiveOrders(userId, region, city)) > 0) {
+    throw new Error('There is already an active order for this user');
+  }
 
   if (existingOrder) {
     // Order already exists - do nothing
