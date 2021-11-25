@@ -11,7 +11,7 @@ export default class Order extends Base {
   products!: CartItem[];
 
   static get tableName() {
-    return 'prescriptions';
+    return 'orders';
   }
 
   static get idColumn() {
