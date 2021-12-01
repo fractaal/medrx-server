@@ -87,11 +87,9 @@ app.post(
 
     // Update firebase database prescription request to confirmed
     try {
-      database()
-        .ref(`/${req.tokenData?.region}/${req.tokenData?.city}/${req.tokenData?.uid}/prescriptionRequests`)
-        .update({
-          status: 'OK',
-        });
+      database().ref(`/${req.tokenData?.region}/${req.tokenData?.city}/${req.tokenData?.uid}/prescription`).update({
+        status: 'OK',
+      });
     } catch (err) {
       logger.error(
         `Pharmacist ${req.tokenData.email} tried to create a prescription for ${req.body.userId}, but an error occured trying to update Firebase: ${err}`
