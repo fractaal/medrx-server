@@ -1,19 +1,33 @@
-import { database } from 'firebase-admin';
+import { database, firestore } from 'firebase-admin';
 import { CartItem } from '../database/models/CartItem';
 import { Delivery } from '../database/models/DeliveryRequest';
 import Logger from '../logger';
 import { getDistance, Location } from '../util/positions';
+import { getUserData } from './user';
 
 const logger = Logger('Delivery Request API');
 
-export const createDeliveryRequest = async (userId: string, region: string, city: string, products: CartItem[]) => {
-  logger.log(`Created a new delivery request for ${userId} on ${region}/${city}`);
-  const location = await getDeliveryRequestDbRef(userId, region, city);
-  location.set({
+export const createDeliveryRequest = async (
+  userId: string,
+  lat: number,
+  lng: number,
+  region: string,
+  city: string,
+  products: CartItem[]
+) => {
+  const { firstName, middleName, lastName } = await getUserData(userId);
+  const ref = await getDeliveryRequestDbRef(userId, region, city);
+  ref.set({
+    lat,
+    lng,
+    firstName,
+    middleName,
+    lastName,
     isAccepted: false,
     products,
   });
-  return location;
+  logger.log(`Created a new delivery request for ${userId} on ${region}/${city}`);
+  return ref;
 };
 
 export const getDeliveryRequestDbRef = async (userId: string, region: string, city: string) => {
