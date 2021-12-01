@@ -15,6 +15,7 @@ import { body } from 'express-validator';
 import validationHandler from '../util/validation-handler';
 
 import { createOrderAndDeliveryRequest } from '../api/order-and-delivery-request';
+import checkAuth from '../util/check-auth';
 
 const logger = Logger('Prescription');
 
@@ -140,44 +141,56 @@ app.get('/prescription/latest', async (req, res) => readController(req, res, tru
 app.get('/prescription/:id', async (req, res) => readController(req, res));
 
 // Update controllers (Confirm)
-app.patch('/prescription/confirm', async (req, res) => {
-  const latestPrescription = await Prescription.query()
-    .withSchema(regionClaimsToSchema(req.tokenData!.region))
-    .orderBy('dateCreated')
-    .first();
+app.patch(
+  '/prescription/confirm',
 
-  if (!latestPrescription?.isValid) {
-    logger.log(`User ${req.tokenData?.email} tried to confirm a prescription, but they do not have a valid one.`);
-    res.status(401).json(new ResponseData(true, 'User does not have a valid prescription.'));
-    return;
-  }
+  body('lat').isNumeric(),
+  body('lng').isNumeric(),
+  checkAuth,
 
-  await latestPrescription
-    .$query()
-    .withSchema(regionClaimsToSchema(req.tokenData!.region))
-    .patch({ isValid: false, isConfirmed: true, dateConfirmedOrCancelled: new Date().toISOString() });
+  async (req, res) => {
+    if (!validationHandler(req, res)) return;
 
-  try {
-    await createOrderAndDeliveryRequest(
-      req.tokenData!.uid,
-      latestPrescription.products,
-      req.tokenData!.region,
-      req.tokenData!.city,
-      latestPrescription.id
+    const latestPrescription = await Prescription.query()
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))
+      .orderBy('dateCreated')
+      .first();
+
+    if (!latestPrescription?.isValid) {
+      logger.log(`User ${req.tokenData?.email} tried to confirm a prescription, but they do not have a valid one.`);
+      res.status(401).json(new ResponseData(true, 'User does not have a valid prescription.'));
+      return;
+    }
+
+    await latestPrescription
+      .$query()
+      .withSchema(regionClaimsToSchema(req.tokenData!.region))
+      .patch({ isValid: false, isConfirmed: true, dateConfirmedOrCancelled: new Date().toISOString() });
+
+    try {
+      await createOrderAndDeliveryRequest(
+        req.tokenData!.uid,
+        req.body.lat,
+        req.body.lng,
+        latestPrescription.products,
+        req.tokenData!.region,
+        req.tokenData!.city,
+        latestPrescription.id
+      );
+    } catch (err) {
+      logger.error(
+        `User ${req.tokenData?.email} tried to confirm a prescription, but an error occured trying to create an order: ${err}`
+      );
+      res.status(500).json(new ResponseData(true, 'An error occured on our end. Please try again.'));
+      return;
+    }
+
+    logger.log(
+      `User ${req.tokenData?.email} confirmed a prescription ${latestPrescription.id} and has put out a delivery request.`
     );
-  } catch (err) {
-    logger.error(
-      `User ${req.tokenData?.email} tried to confirm a prescription, but an error occured trying to create an order: ${err}`
-    );
-    res.status(500).json(new ResponseData(true, 'An error occured on our end. Please try again.'));
-    return;
+    res.json(new ResponseData(false, 'Created a delivery for this user'));
   }
-
-  logger.log(
-    `User ${req.tokenData?.email} confirmed a prescription ${latestPrescription.id} and has put out a delivery request.`
-  );
-  res.json(new ResponseData(false, 'Created a delivery for this user'));
-});
+);
 
 // Update controllers (cancel)
 app.patch('/prescription/cancel', async (req, res) => {
