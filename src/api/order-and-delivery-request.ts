@@ -1,4 +1,4 @@
-import { database } from 'firebase-admin';
+import { database, firestore } from 'firebase-admin';
 import Order from '../database/models/Order';
 import { CartItem } from '../database/models/CartItem';
 import { createDeliveryRequest, deleteDeliveryRequest, getDeliveryRequestDbRef } from './delivery-request';
@@ -11,6 +11,8 @@ const logger = Logger('Order & Delivery Request API');
 
 export const createOrderAndDeliveryRequest = async (
   userId: string,
+  lat: number,
+  lng: number,
   products: CartItem[],
   region: string,
   city: string,
@@ -45,7 +47,7 @@ export const createOrderAndDeliveryRequest = async (
   }
 
   try {
-    deliveryRequestRef = await createDeliveryRequest(userId, region, city, products);
+    deliveryRequestRef = await createDeliveryRequest(userId, lat, lng, region, city, products);
   } catch (err) {
     await deleteOrder(order?.id, userId, region, city);
     logger.error(
