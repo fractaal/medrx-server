@@ -46,8 +46,8 @@ export const deleteOrder = async (orderId: string, userId: string, region: strin
 };
 
 export const countActiveOrders = async (userId: string, region: string, city: string) => {
-  // @ts-ignore
   return parseInt(
-    (await Order.query().withSchema(regionClaimsToSchema(region)).where({ userId, isActive: true }).count())[0].count
+    ((await Order.query().withSchema(regionClaimsToSchema(region)).where({ userId, isActive: true }).count())[0] as any)
+      .count
   );
 };
