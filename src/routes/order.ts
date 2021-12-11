@@ -18,6 +18,8 @@ app.post(
   body('userId').isString(),
   body('products').isArray(),
   body('prescriptionId').isString().optional({ nullable: true }),
+  body('lat').isNumeric(),
+  body('lng').isNumeric(),
 
   async (req, res) => {
     // @ts-ignore
@@ -26,6 +28,8 @@ app.post(
     try {
       await createOrderAndDeliveryRequest(
         req.body.userId,
+        req.body.lat,
+        req.body.lng,
         req.body.products,
         req.body.region,
         req.body.city,
