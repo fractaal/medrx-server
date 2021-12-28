@@ -38,45 +38,39 @@ export default async () => {
   const vendors = await Vendor.query().withSchema('REGION_X').select();
 
   const photoUrls = [
-    'https://admin.americanaddictioncenters.org/wp-content/uploads/2016/02/Pills-3209654.jpg',
-    'https://assets.unilab.com.ph/uploads/Common/Products/Biogesic/Biogesic-Tablet-Product-Shot-New.jpg',
-    'https://www.rosepharmacy.com/ph1/wp-content/uploads/2016/09/67195.jpg',
-    'https://images.theconversation.com/files/256057/original/file-20190129-108364-17hlc1x.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1200&h=900.0&fit=crop',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWnZD5Zxu4B5L9npIBbT0nrDJB0wcyP4-JqOh-vahp90LdMHnrvwjaCeqeaDelB2-tqrs&usqp=CAU',
-    'https://www.history.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:good%2Cw_1200/MTU3ODc3NjU2MjA5NjYzMzA1/fast-facts-about-the-war-on-drugs.jpg',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxIHwxBr5aNCt4y68LmWHog-0sim3YfOVxir4nFutLe36us8WEsjsEala4yOw3UtvnVs0&usqp=CAU',
-    'https://images.news18.com/ibnlive/uploads/2020/09/1599377768_weed.jpeg',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnLU7AZjk4QpX2flxtSsL_8hlS1IbRT8BPXA&usqp=CAU',
-    'https://rehabs.com/static/explore/meth-before-and-after-drugs/img/block1_img.png',
-    'https://www.thetimes.co.uk/imageserver/image/%2Fmethode%2Ftimes%2Fprod%2Fweb%2Fbin%2F22c44eda-ad0f-11e6-a67d-ec9aa6156041.jpg?crop=1500%2C1000%2C0%2C0',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLZpbxPRJNcaePkzq8Oj9eWK5BVlPKbAqvhg&usqp=CAU',
+    'https://images.theconversation.com/files/369567/original/file-20201116-23-18wlnv.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1200&h=1200.0&fit=crop',
+    'https://www.afd.fr/sites/afd/files/styles/visuel_principal/public/2019-10-09-27-46/flickr-marco-verch.jpg?itok=XH4x7-Y4',
+    'https://i0.wp.com/post.medicalnewstoday.com/wp-content/uploads/sites/3/2021/07/ulcerative_colitis_GettyImages569038309_Thumb-732x549.jpg?w=1155',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6VNPl1YijpoJCaXgl2-PjOiCPjWaImubOfQ&usqp=CAU',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfLp3J8udkG047My_eUsU-4fCnONE_w4CQQPq2EcEX2MdSPiFpUILvzL_EjnRDcSmbMIA&usqp=CAU',
+    'https://www.medicaldevice-network.com/wp-content/uploads/sites/11/2021/02/shutterstock_544348294-1.jpg',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdPMkXdVkpox58iaDEPWcXvmJjCq4SfDEguaq11ZKK6QW3O-RYsRyMlJrmEvyMbgrdz8Q&usqp=CAU',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsFA12gy18e_fE7CEvURM59-BcUu47wZ5jJg&usqp=CAU',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAt84uHYBrR01wDvz-NHeokjlFldUgaPnwNw&usqp=CAU',
+    'https://ichef.bbci.co.uk/news/976/cpsprodpb/15DA3/production/_115370598_tv038457905.jpg',
+    'https://cdn.vox-cdn.com/thumbor/PcwIpwPY1k6td83nhkRZ-iBRU3U=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/22047683/amazon_pharmacy.jpg',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMZvUIlbS64_Fuw7DvEzyJ32l0syKs-9zweQ&usqp=CAU',
   ];
 
-  // const names = [
-  //   'Paracetamol 10mg Variation',
-  //   'Penicillin 28419824mg Variation',
-  //   'Airbus A320 CFM Leap Variation',
-  //   'Alnix',
-  //   'Biogesic',
-  //   'Centrum',
-  //   'Cherifer',
-  //   'Celine',
-  //   'Pfizer Vaccine',
-  //   'Moderna Vaccine',
-  //   'J&J Vaccine',
-  //   'Astrazeneca Vaccine',
-  //   'Sinovac Vaccine',
-  //   'Free 5G Installations',
-  //   'Aspirin',
-  //   'OBAMIUM',
-  // ];
+  const names = [
+    'Paracetamol 10mg Variation',
+    'Penicillin 100mg Variation',
+    'Alnix',
+    'Biogesic',
+    'Centrum',
+    'Cherifer',
+    'Celine',
+    'Aspirin',
+  ];
 
   for (let i = 0; i < 100; i++) {
     const idx = Math.floor(Math.random() * (vendors.length - 1));
     const vendor = vendors[idx];
     log.log(`Foreign key ${vendor.id}`);
 
-    const productName = faker.commerce.productAdjective() + ' ' + faker.commerce.productName();
+    const randomName = names[Math.floor(Math.random() * names.length)];
+
+    const productName = faker.commerce.productAdjective() + ' ' + randomName;
     const photoUrl = photoUrls[Math.floor(Math.random() * (photoUrls.length - 1))];
 
     const toInsert = {
