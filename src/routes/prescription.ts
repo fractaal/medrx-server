@@ -107,7 +107,7 @@ app.post(
         products: JSON.stringify(cartItems),
         isValid: true,
         isConfirmed: false,
-        extraRemarks: req.body.extraRemarks,
+        remarks: req.body.extraRemarks,
       });
 
     logger.log(`Pharmacist ${req.tokenData?.email} created a prescription ${prescription.id} for ${req.body.userId}`);
