@@ -8,11 +8,6 @@ import { knex } from '../database';
 
 const log = Logger('Seeder');
 
-const mercuryDesc = fs.readFileSync(path.resolve(__dirname, 'mercury.txt'), { encoding: 'utf-8' });
-const roseDesc = fs.readFileSync(path.resolve(__dirname, 'rose.txt'), { encoding: 'utf-8' });
-const tgpDesc = fs.readFileSync(path.resolve(__dirname, 'tgp.txt'), { encoding: 'utf-8' });
-const watsonsDesc = fs.readFileSync(path.resolve(__dirname, 'watsons.txt'), { encoding: 'utf-8' });
-
 export default async () => {
   const hasAlreadyBeenSeeded =
     (await knex('metadata').withSchema('REGION_X').where({ key: 'seeded' }).first())?.value ?? 'false';
@@ -24,16 +19,16 @@ export default async () => {
 
   await Vendor.query()
     .withSchema('REGION_X')
-    .insert({ name: 'Mercury Drug Store', content: mercuryDesc, city: 'Cagayan de Oro City' });
+    .insert({ name: 'Mercury Drug Store', content: MERCURY, city: 'Cagayan de Oro City' });
   await Vendor.query()
     .withSchema('REGION_X')
-    .insert({ name: 'Rose Pharmacy', content: roseDesc, city: 'Cagayan de Oro City' });
+    .insert({ name: 'Rose Pharmacy', content: ROSE, city: 'Cagayan de Oro City' });
   await Vendor.query()
     .withSchema('REGION_X')
-    .insert({ name: 'The Generics Pharmacy', content: tgpDesc, city: 'Cagayan de Oro City' });
+    .insert({ name: 'The Generics Pharmacy', content: TGP, city: 'Cagayan de Oro City' });
   await Vendor.query()
     .withSchema('REGION_X')
-    .insert({ name: 'Watsons', content: watsonsDesc, city: 'Cagayan de Oro City' });
+    .insert({ name: 'Watsons', content: WATSONS, city: 'Cagayan de Oro City' });
 
   const vendors = await Vendor.query().withSchema('REGION_X').select();
 
@@ -91,3 +86,39 @@ export default async () => {
 
   log.success('Seed complete');
 };
+
+var MERCURY = `History
+Mercury Drug began from a bottle of sulfathiazole, which was considered a wonder drug after the war.
+
+It was 1945, and Manila had just been liberated from the Japanese occupation. The city was devastated and medicines were scarce and expensive. Mariano Que, who worked in a drugstore before the war, saw the need. He went to Bambang St., Manila, where the action was then, on advice of a friend, and saw a peddler selling sulfathiazole there. He recognized it as the 'wonder drug' believed to cure all diseases. Seeing a 'W' on the tablets, he knew it was the genuine sulfathiazole. He tried to buy a bottle for P100, the only money in his pocket.
+
+
+The peddler wanted more but as Mariano Que had only P100, the peddler agreed to sell to him. He then sold these tablets by piece or “tingi-tingi” to make the medicine more affordable. With some profit, he was able to purchase other medicines and eventually a pushcart, which he loaded with his growing supply of pharmaceutical goods.
+
+From these humble beginnings, the first Mercury Drug store opened on March 1, 1945 in Bambang St.`
+
+var ROSE = `About Us
+Welcome To Rose Pharmacy - A New Experience In Health, Beauty And Well-Being.
+With over 300 branches in strategic locations all over the country, Rose Pharmacy is recognized as one of the Philippines’ top pharmaceutical retailers, providing customers with easy access to quality health and beauty products.
+
+Rose Pharmacy recently joined forces with Robinsons Retail Holdings Inc. (RRHI), the second largest retailer in the country, in October 2020. Committed to offering the best health and beauty shopping experience to customers with the unique touch of passionate care, Rose Pharmacy continues to expand its services beyond conventional limits – serving customers at the comfort of their own homes with RosExpress Delivery, fulfilling health and beauty needs across the country with the Rose Pharmacy Online Store’s nationwide delivery, and providing round-the-clock service with 24-Hour stores.
+
+With a strong focus on bringing value to customers, Rose Pharmacy has launched Rose Pharmacy Generics, ensuring high-quality prescription and over-the-counter medicines are made widely available for everyday affordable prices. The Guardian line of personal care products bring gentle, quality care for every member of the family at consistently low prices as well. Rose Pharmacy’s monthly Hot Deals, SuperSavers, and Buy More Save More promotions and special offers further provide great value to customers both in-store and online.`
+
+var TGP = `THE GENERICS PHARMACY (TGP) started out as small pharmaceutical company in 1949. Acknowledging the dire need for quality medicines but at affordable prices, the company focused on generic medicines to provide the Filipino with a more affordable alternative.
+
+In 2001, the company ventured into retail, starting only with a single outlet. As demand grew, the company decided to bring their medicines more accessible to all the far reaches of the country through the FRANCHISING business model. The historic year was 2007, starting with 20 outlets within Metro Manila.
+
+Now as TGP, it revolutionized the entire Pharmaceutical healthcare industry and pharmaceutical retail with its bold and different path for growth. Who would think that a pharmacy or a drugstore with pure generic drugs rapidly take off? After the initial struggles and birth pains, the healthcare landscape has embraced and accepted generic medicine as it has proven to be effective and of high quality standards and yet, truly affordable for every Juan.
+
+Now only on its 10th year in full pharmacy retail and franchising, TGP has dotted the entire archipelago with more than 1900 strong outlets, making healthcare accessible to every Filipino. As expansion grew rapidly, so with the numerous awards and recognition TGP received from various entrepreneurship, retail, franchising and marketing organizations. This is solid proof that TGP is now well accepted and trusted as source of quality and affordable generic medicines. The massive reach and accessibility made TGP a friendly neighborhood pharmacy outlet. TGP is now the largest retail pharmacy chain in the country.
+
+We carry on with the vision to hit 2000 strong outlets to serve the Filipino.`
+
+var WATSONS = `About Us
+Welcome To Rose Pharmacy - A New Experience In Health, Beauty And Well-Being.
+With over 300 branches in strategic locations all over the country, Rose Pharmacy is recognized as one of the Philippines’ top pharmaceutical retailers, providing customers with easy access to quality health and beauty products.
+
+Rose Pharmacy recently joined forces with Robinsons Retail Holdings Inc. (RRHI), the second largest retailer in the country, in October 2020. Committed to offering the best health and beauty shopping experience to customers with the unique touch of passionate care, Rose Pharmacy continues to expand its services beyond conventional limits – serving customers at the comfort of their own homes with RosExpress Delivery, fulfilling health and beauty needs across the country with the Rose Pharmacy Online Store’s nationwide delivery, and providing round-the-clock service with 24-Hour stores.
+
+With a strong focus on bringing value to customers, Rose Pharmacy has launched Rose Pharmacy Generics, ensuring high-quality prescription and over-the-counter medicines are made widely available for everyday affordable prices. The Guardian line of personal care products bring gentle, quality care for every member of the family at consistently low prices as well. Rose Pharmacy’s monthly Hot Deals, SuperSavers, and Buy More Save More promotions and special offers further provide great value to customers both in-store and online.`
